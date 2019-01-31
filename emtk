@@ -1,0 +1,37 @@
+#!/bin/bash
+
+module=$1
+if [ $module = "polarity" ]
+then
+    # POLARITY MODULE
+    cd ./polarity/ClassificationTask/
+    exec sh classificationTask.sh ${@:2}
+
+elif [ $module = "emotions" ]
+then
+    # EMOTIONS MODULE
+    task=$2
+
+    if [ $task = "train" ]
+    then
+        
+        # Train
+        cd ./emotions
+        exec sh train.sh ${@:3}
+    elif [ $task = "classify" ]
+    then
+
+        # Classify
+        cd ./emotions
+        exec sh classify.sh ${@:3}
+    else
+        # wrong/missing task name
+        echo "Check the first argument after 'emotions':"
+        echo "There is no task named '$1'!"
+    fi
+
+else
+    # WRONG/MISSING MODULE NAME
+    echo "Check the first argument after './emtk.sh':"
+    echo "There is no module named '$1'!"
+fi
