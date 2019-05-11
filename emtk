@@ -1,15 +1,131 @@
 #!/bin/bash
 
+POSITIONAL=() # Used to restore positional arguments later
+
+
 module=$1
+shift # past module argument
+
 if [ $module = "polarity" ]
 then
-    # POLARITY MODULE
+    
+    # =============== #
+    # POLARITY MODULE #
+    # =============== #
+
+    # Move to the module folder
     cd ./polarity/ClassificationTask/
-    exec sh classificationTask.sh ${@:2}
+    SCRIPTDIR='.'
+
+    # Parse the command line arguments
+    while [[ $# -gt 0 ]] # while the number of arguments is greater than 0...
+    do
+
+    key="$1"
+    
+    case $key in
+ 
+        -F)
+        # -F {A, S, L, K}, feature to evaluate A for All, S for Semantic, L for Lexicon, K for Keyword.
+        FEATURES="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -i)
+        # -i <input.csv>: the input data to classify.
+        INPUT_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -o)
+        # -o <output.csv>: the resulting predictions.
+        OUTPUT_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -H|--heapsize)
+        # -H 30000m: set maximum Java heap size
+        MAX_HEAP_SIZE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -W)
+        # -W <wordspace.bin>: the wordspace to use.
+        WORDSPACE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -vd)
+        # -vd <n>: the vector size.
+        VECTOR_SIZE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -L)
+        # -L: [optional] if present, the input corpus comes with a gold label in the label column.
+        GOLD_LABEL=TRUE
+        shift # past argument
+        ;;
+
+        -ul)
+        # -ul <filename>: [optional] the unigram's list.
+        UNIGRAMS_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -bl)
+        BIGRAMS_FILE="$2"
+        # -bl <filename>: [optional] the bigram's list.
+        shift # past argument
+        shift # past value
+        ;;
+
+        *) # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+
+    esac
+    done
+    set -- "${POSITIONAL[@]}" # restore positional parameters
+
+    # Make sure the input file is correctly specified
+    if [ -z $INPUT_FILE ]; then
+        echo "Usage: classificationTash.sh input.csv [predictions.csv]"
+    elif [ ! -f $INPUT_FILE ]; then
+        echo "File $INPUT_FILE not found!"
+
+    else
+
+        # Provide a default name for the output file, when it's not specified
+        outputFile="$SCRIPTDIR/${OUTPUT_FILE:-"predictions.csv"}"
+
+        # Feature extraction
+        java -jar -Xmx${MAX_HEAP_SIZE:-"30000m"} $SCRIPTDIR/Senti4SD-fast.jar -F ${FEATURES:-A} -i ${INPUT_FILE} -W ${WORDSPACE:-"$SCRIPTDIR/dsm.bin"}  -oc $SCRIPTDIR/extractedFeatures.csv -vd ${VECTOR_SIZE:-600}${GOLD_LABEL:+" -L"}${UNIGRAMS_FILE:+" -ul "}$UNIGRAMS_FILE${BIGRAMS_FILE:+" -bl "}$BIGRAMS_FILE
+
+        # Classification
+        Rscript $SCRIPTDIR/classification.R $SCRIPTDIR/extractedFeatures.csv $outputFile
+
+        # Remove working files
+        rm $SCRIPTDIR/extractedFeatures.csv
+
+    fi
+
 
 elif [ $module = "emotions" ]
 then
-    # EMOTIONS MODULE
+
+    # =============== #
+    # EMOTIONS MODULE #
+    # =============== #
+
     task=$2
 
     if [ $task = "train" ]
