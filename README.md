@@ -5,6 +5,12 @@ Dockerfile for building the EMTk image
 `0.2.1` (2019-03-25)
 
 ### Instructions
+First, execute the Docker container in interactive mode. By default, the instruction below will execute the `latest` version.
+
+```bash
+# docker run -it collabuniba/emtk
+```
+
 
 ##### Polarity module
 
