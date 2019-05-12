@@ -126,20 +126,21 @@ then
     # EMOTIONS MODULE #
     # =============== #
 
-    task=$2
+    task=$1
+    shift # past module argument
 
     if [ $task = "train" ]
     then
         
         # Train
         cd ./emotions
-        exec sh train.sh ${@:3}
+        exec sh train.sh ${@:2}
     elif [ $task = "classify" ]
     then
 
         # Classify
         cd ./emotions
-        exec sh classify.sh ${@:3}
+        exec sh classify.sh ${@:2}
     else
         # wrong/missing task name
         echo "Check the first argument after 'emotions':"
