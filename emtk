@@ -132,12 +132,14 @@ then
     then
         
         # Train
-        exec sh /emotions/train.sh ${@:2}
+        cd ./emotions
+        exec sh train.sh ${@:1}
     elif [ $task = "classify" ]
     then
 
         # Classify
-        exec sh /emotions/classify.sh ${@:2}
+        cd ./emotions
+        exec sh classify.sh ${@:1}
     else
         # wrong/missing task name
         echo "Check the first argument after 'emotions':"
