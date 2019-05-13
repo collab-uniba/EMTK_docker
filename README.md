@@ -17,14 +17,14 @@ First, execute the Docker container in interactive mode. By default, the instruc
 The second line logs you in the container’s shell environment (`>`). From there, to execute the polarity module, run:
 
 ```bash
-> emtk polarity -F A -i input.csv -W wordSpace.bin -oc output.csv -vd 600 [-L] [-ul unigramList -bl bigramList]
+> emtk polarity -F A -i input.csv -W dsm.bin -oc output.csv -vd 600 [-L] [-ul unigramList -bl bigramList]
 ```
 
 where:
 
 - `-F {A, S, L, K}`, feature to evaluate `A` for All, S for Semantic, `L` for Lexicon, `K` for Keyword.
 - `-i <input.csv>`: the input data to classify. 
-- `-W <wordSpace.bin>`: the wordspace to use.
+- `-W <dsm.bin>`: the wordspace to use.
 - `-oc <output.csv>`: the resulting predictions. 
 - `-vd <N>`: the vector size.
 - `-L`: [optional] if present, the input corpus comes with a gold label in the label column.
