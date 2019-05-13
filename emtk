@@ -13,9 +13,8 @@ then
     # POLARITY MODULE #
     # =============== #
 
-    # Move to the module folder
-    cd ./polarity/ClassificationTask/
-    SCRIPTDIR='.'
+    # The script's directory
+    SCRIPTDIR="/polarity/ClassificationTask"
 
     # Parse the command line arguments
     while [[ $# -gt 0 ]] # while the number of arguments is greater than 0...
@@ -113,7 +112,7 @@ then
         # Classification
         Rscript $SCRIPTDIR/classification.R $SCRIPTDIR/extractedFeatures.csv $outputFile
 
-        # Remove working files
+        # Remove the file with the extracted features
         rm $SCRIPTDIR/extractedFeatures.csv
 
     fi
@@ -133,14 +132,12 @@ then
     then
         
         # Train
-        cd ./emotions
-        exec sh train.sh ${@:2}
+        exec sh /emotions/train.sh ${@:2}
     elif [ $task = "classify" ]
     then
 
         # Classify
-        cd ./emotions
-        exec sh classify.sh ${@:2}
+        exec sh /emotions/classify.sh ${@:2}
     else
         # wrong/missing task name
         echo "Check the first argument after 'emotions':"
