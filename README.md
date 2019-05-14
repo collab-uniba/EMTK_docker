@@ -8,7 +8,7 @@ Dockerfile for building the EMTk image
 First, execute the Docker container in interactive mode. By default, the instruction below will execute the `latest` version.
 
 ```bash
-# docker run -it collabuniba/emtk
+# docker run --rm -it collabuniba/emtk
 ```
 
 
