@@ -104,7 +104,7 @@ then
     else
 
         # Provide a default name for the output file, when it's not specified
-        outputFile="$SCRIPTDIR/${OUTPUT_FILE:-"predictions.csv"}"
+        outputFile="${OUTPUT_FILE:-"predictions.csv"}"
 
         # Feature extraction
         java -jar -Xmx${MAX_HEAP_SIZE:-"30000m"} $SCRIPTDIR/Senti4SD-fast.jar -F ${FEATURES:-A} -i ${INPUT_FILE} -W ${WORDSPACE:-"$SCRIPTDIR/dsm.bin"}  -oc $SCRIPTDIR/extractedFeatures.csv -vd ${VECTOR_SIZE:-600}${GOLD_LABEL:+" -L"}${UNIGRAMS_FILE:+" -ul "}$UNIGRAMS_FILE${BIGRAMS_FILE:+" -bl "}$BIGRAMS_FILE
