@@ -45,7 +45,7 @@ then
         shift # past value
         ;;
 
-        -H|--heapsize)
+        -X|--heapsize)
         # -H 30000m: set maximum Java heap size
         MAX_HEAP_SIZE="$2"
         shift # past argument
