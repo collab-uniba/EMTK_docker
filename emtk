@@ -1,7 +1,7 @@
 #!/bin/bash
 
+CURRENT_FOLDER=$PWD
 POSITIONAL=() # Used to restore positional arguments later
-
 
 module=$1
 shift # past module argument
@@ -38,8 +38,8 @@ then
         shift # past value
         ;;
 
-        -o)
-        # -o <output.csv>: the resulting predictions.
+        -oc)
+        # -oc <output.csv>: the resulting predictions.
         OUTPUT_FILE="$2"
         shift # past argument
         shift # past value
@@ -166,7 +166,7 @@ then
         else
             
             # Move to the `emotions` module folder
-            cd ./emotions
+            cd /emotions
 
             # Train
             exec sh train.sh -i $INPUT_FILE ${@:1}
@@ -234,7 +234,7 @@ then
         else
 
             # Move to the `emotions` module folder
-            cd ./emotions
+            cd /emotions
 
             # Classify
             exec sh classify.sh -i $INPUT_FILE${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1}
