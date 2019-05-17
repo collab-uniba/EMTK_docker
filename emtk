@@ -1,10 +1,10 @@
 #!/bin/bash
 
-CURRENT_FOLDER=$PWD
+CURRENT_FOLDER=$PWD # Path to the current folder
 POSITIONAL=() # Used to restore positional arguments later
 
 module=$1
-shift # past module argument
+shift # past module argument (polarity/emotion)
 
 if [ $module = "polarity" ]
 then
@@ -126,7 +126,7 @@ then
     # =============== #
 
     task=$1
-    shift # past module argument
+    shift # past task argument (train/classify)
 
     if [ $task = "train" ]
     then
@@ -249,6 +249,6 @@ then
 
 else
     # WRONG/MISSING MODULE NAME
-    echo "Check the first argument after './emtk.sh':"
+    echo "Check the first argument after 'emtk':"
     echo "There is no module named '$1'!"
 fi
