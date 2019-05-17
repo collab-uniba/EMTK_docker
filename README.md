@@ -57,7 +57,7 @@ where:
 
 - `-e {joy, anger, sadness, love, surprise, fear}`: the emotion to be detected.
 
-As a result, the script will generate an output folder in the present current directory named `training_<file.csv>_<emotion>/`, containing:
+As a result, the script will generate an output folder in the present working directory named `training_<file.csv>_<emotion>/`, containing:
 
 - `n-grams/`: a subfolder containing the extracted n-grams.
 - `idfs/`: a subfolder containing the IDFs computed for n-grams and WordNet Affect emotion words.
@@ -85,7 +85,7 @@ where:
 - `-o /path/to/.../ngrams`: [optional] with custom models, also the path to the folder containing the dictionaries extracted during the training step; the folder must include n-grams (i.e., UnigramsList.txt and BigramsList.txt).
 - `-l`: [optional] if present, the input corpus comes with a gold label in the column label.
 
-As a result, the script will create an output folder in the present current directory named `classification_<file.csv>_<emotion>`, containing:
+As a result, the script will create an output folder in the present working directory named `classification_<file.csv>_<emotion>`, containing:
 
 - `predictions_<emotion>.csv`: a csv file, containing a binary prediction (yes/no) for each line of the input corpus:
 
