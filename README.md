@@ -77,6 +77,7 @@ Finally, to execute the classification task, run:
 where:
 
 - `-i <file.csv>`: same as above.
+- `-p`: enables the extraction of features regarding politeness, mood and modality.
 - `-d {c, sc}`: same as above.
 - `-e {joy, anger, sadness, love, surprise, fear}`: same as above.
 - `-m model`: [optional] the model file learned during the training step; if not specified, as default the model learned on the Stack Overflow gold standard will be used.
