@@ -169,7 +169,7 @@ then
         else            
 
             # Train
-            exec bash train.sh -i $INPUT_FILE ${@:1}
+            (exec bash train.sh -i $INPUT_FILE ${@:1})
         fi
 
     elif [ $task = "classify" ]
@@ -244,10 +244,12 @@ then
         else
 
             # Classify
-            exec bash classify.sh -i $INPUT_FILE -e $EMOTION${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1}
+            (exec bash classify.sh -i $INPUT_FILE -e $EMOTION${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1})
 
-            OUTPUT_FOLDER_NAME="classification_${INPUT_FILE##*/}""_$EMOTION"
-            mv OUTPUT_FOLDER_NAME $CURRENT_FOLDER/OUTPUT_FOLDER_NAME
+            # Move the output folder to the user's current directory
+            BASENAME=${INPUT_FILE##*/} # basename of the input file
+            OUTPUT_FOLDER_NAME="classification_${BASENAME%.csv}""_$EMOTION"
+            mv $OUTPUT_FOLDER_NAME $CURRENT_FOLDER/$OUTPUT_FOLDER_NAME
         
         fi
 
