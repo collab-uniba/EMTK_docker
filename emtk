@@ -169,7 +169,7 @@ then
         else            
 
             # Train
-            exec sh train.sh -i $INPUT_FILE ${@:1}
+            exec bash train.sh -i $INPUT_FILE ${@:1}
         fi
 
     elif [ $task = "classify" ]
@@ -237,7 +237,7 @@ then
         else
 
             # Classify
-            exec sh classify.sh -i $INPUT_FILE${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1}
+            exec bash classify.sh -i $INPUT_FILE${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1}
         
         fi
 
