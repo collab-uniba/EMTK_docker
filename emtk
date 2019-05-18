@@ -1,29 +1,273 @@
 #!/bin/bash
 
+CURRENT_FOLDER=$PWD # Path to the current folder
+POSITIONAL=() # Used to restore positional arguments later
+
 module=$1
+shift # past module argument (polarity/emotion)
+
 if [ $module = "polarity" ]
 then
-    # POLARITY MODULE
-    cd ./polarity/ClassificationTask/
-    exec sh classificationTask.sh ${@:2}
+    
+    # =============== #
+    # POLARITY MODULE #
+    # =============== #
+
+    # The script's directory
+    SCRIPTDIR="/polarity/ClassificationTask"
+
+    # Parse the command line arguments
+    while [[ $# -gt 0 ]] # while the number of arguments is greater than 0...
+    do
+
+    key="$1"
+    
+    case $key in
+ 
+        -F)
+        # -F {A, S, L, K}, feature to evaluate A for All, S for Semantic, L for Lexicon, K for Keyword.
+        FEATURES="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -i)
+        # -i <input.csv>: the input data to classify.
+        INPUT_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -oc)
+        # -oc <output.csv>: the resulting predictions.
+        OUTPUT_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -X|--heapsize)
+        # -H 30000m: set maximum Java heap size
+        MAX_HEAP_SIZE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -W)
+        # -W <wordspace.bin>: the wordspace to use.
+        WORDSPACE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -vd)
+        # -vd <n>: the vector size.
+        VECTOR_SIZE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -L)
+        # -L: [optional] if present, the input corpus comes with a gold label in the label column.
+        GOLD_LABEL=TRUE
+        shift # past argument
+        ;;
+
+        -ul)
+        # -ul <filename>: [optional] the unigram's list.
+        UNIGRAMS_FILE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+
+        -bl)
+        BIGRAMS_FILE="$2"
+        # -bl <filename>: [optional] the bigram's list.
+        shift # past argument
+        shift # past value
+        ;;
+
+        *) # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+
+    esac
+    done
+    set -- "${POSITIONAL[@]}" # restore the unparsed positional parameters
+
+    # Make sure the input file is correctly specified
+    if [ -z $INPUT_FILE ]; then
+        echo "Input file not specified!"
+    elif [ ! -f $INPUT_FILE ]; then
+        echo "File $INPUT_FILE not found!"
+
+    else
+
+        # Provide a default name for the output file, when it's not specified
+        outputFile="${OUTPUT_FILE:-"predictions.csv"}"
+
+        # Feature extraction
+        java -jar -Xmx${MAX_HEAP_SIZE:-"30000m"} $SCRIPTDIR/Senti4SD-fast.jar -F ${FEATURES:-A} -i ${INPUT_FILE} -W ${WORDSPACE:-"$SCRIPTDIR/dsm.bin"}  -oc $SCRIPTDIR/extractedFeatures.csv -vd ${VECTOR_SIZE:-600}${GOLD_LABEL:+" -L"}${UNIGRAMS_FILE:+" -ul "}$UNIGRAMS_FILE${BIGRAMS_FILE:+" -bl "}$BIGRAMS_FILE
+
+        # Classification
+        Rscript $SCRIPTDIR/classification.R $SCRIPTDIR/extractedFeatures.csv $outputFile
+
+        # Remove the file with the extracted features
+        rm $SCRIPTDIR/extractedFeatures.csv
+
+    fi
+
 
 elif [ $module = "emotions" ]
 then
-    # EMOTIONS MODULE
-    task=$2
+
+    # =============== #
+    # EMOTIONS MODULE #
+    # =============== #
+
+    task=$1
+    shift # past task argument (train/classify)
 
     if [ $task = "train" ]
     then
-        
-        # Train
-        cd ./emotions
-        exec sh train.sh ${@:3}
+
+        # Parse the command line arguments
+        while [[ $# -gt 0 ]] # while the number of arguments is greater than 0...
+            do
+
+            key="$1"
+            
+            case $key in
+
+                -i)
+                # the input file coded in **UTF-8 without BOM**, containing the corpus for the training;
+                if [[ "$2" = /* ]]; then # if it is an absolute path, store $2 as it is
+                    INPUT_FILE="$2"
+                else
+                    INPUT_FILE="../$CURRENT_FOLDER/$2"
+                fi
+                shift # past argument
+                shift # past value
+                ;;
+
+                *) # unknown option
+                POSITIONAL+=("$1") # save it in an array for later
+                shift # past argument
+                ;;
+
+            esac
+
+        done
+        set -- "${POSITIONAL[@]}" # restore the unparsed positional parameters
+
+        # Move to the `emotions` module folder
+        cd /emotions
+
+        # Make sure the input file is correctly specified
+        if [ -z $INPUT_FILE ]; then
+            echo "Input file not specified!"
+        elif [ ! -f $INPUT_FILE ]; then
+            echo "File $INPUT_FILE not found!"
+
+        else            
+
+            # Train
+            (exec bash train.sh -i $INPUT_FILE ${@:1})
+        fi
+
     elif [ $task = "classify" ]
     then
 
-        # Classify
-        cd ./emotions
-        exec sh classify.sh ${@:3}
+        # Parse the command line arguments
+        while [[ $# -gt 0 ]] # while the number of arguments is greater than 0...
+            do
+
+            key="$1"
+            
+            case $key in
+
+                -i)
+                # the input file coded in **UTF-8 without BOM**, containing the corpus for the classification;
+                if [[ "$2" = /* ]]; then # if it is an absolute path, store $2 as it is
+                    INPUT_FILE="$2"
+                else
+                    INPUT_FILE="../$CURRENT_FOLDER/$2"
+                fi
+                shift # past argument
+                shift # past value
+                ;;
+
+                -m)
+                # path to the liblinear model will be used for classification;
+                if [[ "$2" = /* ]]; then # if it is an absolute path, store $2 as it is
+                    LIBLINEAR_MODEL="$2"
+                else
+                    LIBLINEAR_MODEL="../$CURRENT_FOLDER/$2"
+                fi
+                shift # past argument
+                shift # past value
+                ;;
+
+                -o)
+                # path to the n-grams folder containing UnigramsList.txt and BigramsList.txt used to train the model given in input
+                if [[ "$2" = /* ]]; then # if it is an absolute path, store $2 as it is
+                    N_GRAMS_FOLDER="$2"
+                else
+                    N_GRAMS_FOLDER="../$CURRENT_FOLDER/$2"
+                fi
+                shift # past argument
+                shift # past value
+                ;;
+
+                -f)
+                # if you give the model as input you must specify n-grams path containing  UnigramsList.txt and BigramsList.txt used to train the model given in input
+                if [[ "$2" = /* ]]; then # if it is an absolute path, store $2 as it is
+                    MODEL_N_GRAMS="$2"
+                else
+                    MODEL_N_GRAMS="../$CURRENT_FOLDER/$2"
+                fi
+                shift # past argument
+                shift # past value
+                ;;
+
+                -e)
+                # the specific emotion for training the model, defined in joy, anger,sadness, love, surprise, fear
+                EMOTION="$2"
+                shift # past argument
+                shift # past value
+                ;;
+
+                *) # unknown option
+                POSITIONAL+=("$1") # save it in an array for later
+                shift # past argument
+                ;;
+
+            esac
+            
+        done
+        set -- "${POSITIONAL[@]}" # restore the unparsed positional parameters
+        
+        # Move to the `emotions` module folder
+        cd /emotions
+
+        # Make sure the input file is correctly specified
+        if [ -z $INPUT_FILE ]; then
+            echo "Input file not specified!"
+        elif [ ! -f $INPUT_FILE ]; then
+            echo "File $INPUT_FILE not found!"
+
+        else
+
+            # Classify
+            (exec bash classify.sh -i $INPUT_FILE -e $EMOTION${LIBLINEAR_MODEL:+" -m "}$LIBLINEAR_MODEL${N_GRAMS_FOLDER:+" -o "}$N_GRAMS_FOLDER${MODEL_N_GRAMS:+" -f "}$MODEL_N_GRAMS ${@:1})
+
+            # Move the output folder to the user's current directory
+            BASENAME=${INPUT_FILE##*/} # basename of the input file
+            OUTPUT_FOLDER_NAME="classification_${BASENAME%.csv}""_$EMOTION"
+            mv $OUTPUT_FOLDER_NAME $CURRENT_FOLDER/$OUTPUT_FOLDER_NAME
+        
+        fi
+
     else
         # wrong/missing task name
         echo "Check the first argument after 'emotions':"
@@ -32,6 +276,6 @@ then
 
 else
     # WRONG/MISSING MODULE NAME
-    echo "Check the first argument after './emtk.sh':"
+    echo "Check the first argument after 'emtk':"
     echo "There is no module named '$1'!"
 fi

@@ -62,6 +62,8 @@ RUN rm requirements.R
 
 # Copy the main bash script onto the image and make it a command
 COPY ./emtk /
+RUN cp /emotions/sample.csv /emotions_sample.csv
+RUN cp /polarity/ClassificationTask/Sample.csv /polarity_sample.csv
 RUN ln -s /emtk /usr/bin/emtk
 
 # Run the bash inside the container when it starts
