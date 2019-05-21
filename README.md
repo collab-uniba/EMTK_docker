@@ -2,7 +2,7 @@
 Dockerfile for building the EMTk image
 
 ### Latest tag version
-`0.2.1` (2019-03-25)
+`0.2.2` (2019-05-21)
 
 ### Instructions
 First, execute the Docker container in interactive mode. By default, the instruction below will execute the `latest` version.
